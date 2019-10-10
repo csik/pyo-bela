@@ -10,8 +10,8 @@
     "-M": "0",
     "-D": "0",
     "-A": "0",
-    "--pga-gain-left": "30",
-    "--pga-gain-right": "30",
+    "--pga-gain-left": "50",
+    "--pga-gain-right": "50",
     "user": "",
     "make": "CPPFLAGS=-I/usr/include/python2.7 -I/usr/include/arm-linux-gnueabihf/python2.7 -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g0 -fstack-protector-strong -Wformat -Werror=format-security -DNDEBUG -fwrapv -O3 -Wall -Wstrict-prototypes;LDFLAGS=-L/usr/lib/python1.7/config-arm-linux-gnueabihf -L/usr/lib;LDLIBS=-lpython2.7 -lpthread -ldl -lutil -lm -Xlinker -export-dynamic -Wl,-O2 -Wl,-Bsymbolic-functions"
   },
