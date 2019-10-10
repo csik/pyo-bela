@@ -13,8 +13,6 @@ class Pyo {
         void fillin(const float *buffer);
         void analogin(const float *buffer);
         void analogout(float *buffer);
-        void digitalin(BelaContext *context);
-        void digitalout(float *buffer);
         void clear();
         void midievent(int status, int data1, int data2);
         int loadfile(const char *file, int add);
@@ -29,7 +27,6 @@ class Pyo {
         int bufferSize;
         int sampleRate;
         int nAnalogChannels;
-        int nDigitalChannels;
         int nTotalChannels;
         PyThreadState *interpreter;
         float *pyoInBuffer;
