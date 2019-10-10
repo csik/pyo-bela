@@ -13,11 +13,12 @@
 **
 ** All arguments should be equal to the host audio settings.
 */
-void Pyo::setup(int _nChannels, int _bufferSize, int _sampleRate, int _nAnalogChannels) {
+void Pyo::setup(int _nChannels, int _bufferSize, int _sampleRate, int _nAnalogChannels, int _nDigitalChannels) {
     nChannels = _nChannels;
     bufferSize = _bufferSize;
     sampleRate = _sampleRate;
     nAnalogChannels = _nAnalogChannels;
+    nDigitalChannels = _nDigitalChannels;
     nTotalChannels = nChannels+nAnalogChannels;
     interpreter = pyo_new_interpreter(sampleRate, bufferSize, nTotalChannels);
     pyoInBuffer = reinterpret_cast<float*>(pyo_get_input_buffer_address(interpreter));
@@ -25,6 +26,13 @@ void Pyo::setup(int _nChannels, int _bufferSize, int _sampleRate, int _nAnalogCh
     pyoCallback = reinterpret_cast<callPtr*>(pyo_get_embedded_callback_address(interpreter));
     pyoId = pyo_get_server_id(interpreter);
 }
+int gjack_in_5 = 11;
+int gjack_in_6 = 10;
+int gjack_in_7 = 13;
+int gjack_in_8 = 12;
+
+
+
 
 /*
 ** Terminates this object's interpreter.
@@ -65,6 +73,22 @@ void Pyo::analogin(const float *buffer) {
 }
 
 /*
+** This function fills pyo's remaining input buffers (after audio voices)
+** with samples coming from analog inputs. Should be called once per 
+** process block, inside the host's render function.
+**
+** arguments:
+**   *buffer : float *, float pointer pointing to the host's analog buffers.
+*/
+void Pyo::digitalin(BelaContext *context) {
+    digitalRead(context, 0, gjack_in_5); //read the value of the button
+    digitalRead(context, 0, gjack_in_6); //read the value of the button
+    digitalRead(context, 0, gjack_in_7); //read the value of the button
+    digitalRead(context, 0, gjack_in_8); //read the value of the button
+
+}
+
+/*
 ** This function tells pyo to process a buffer of samples and fills the host's
 ** output buffer with new samples. Should be called once per process block,
 ** inside the host's render function.
@@ -90,6 +114,22 @@ void Pyo::process(float *buffer) {
 **   *buffer : float *, float pointer pointing to the host's analog output buffers.
 */
 void Pyo::analogout(float *buffer) {
+    for (int i=0; i<bufferSize; i++) {
+        for (int j=0; j<nAnalogChannels; j++) {
+            buffer[i*nAnalogChannels+j] = pyoOutBuffer[i*nTotalChannels+j+nChannels];
+        }
+    }
+}
+
+/*
+** This function fills the host's analog output buffer with new samples. 
+** Should be called once per process block, after a process() call, inside 
+** the host's render function.
+**
+** arguments:
+**   *buffer : float *, float pointer pointing to the host's analog output buffers.
+*/
+void Pyo::digitalout(float *buffer) {
     for (int i=0; i<bufferSize; i++) {
         for (int j=0; j<nAnalogChannels; j++) {
             buffer[i*nAnalogChannels+j] = pyoOutBuffer[i*nTotalChannels+j+nChannels];

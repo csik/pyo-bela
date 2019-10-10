@@ -1,17 +1,20 @@
 #pragma once
 
 #include "m_pyo.h"
+#include <Bela.h>
 
 typedef int callPtr(int);
 
 class Pyo {
     public:
         ~Pyo();
-        void setup(int nChannels, int bufferSize, int sampleRate, int nAnalogChannels);
+        void setup(int nChannels, int bufferSize, int sampleRate, int nAnalogChannels, int nDigitalChannels);
         void process(float *buffer);
         void fillin(const float *buffer);
         void analogin(const float *buffer);
         void analogout(float *buffer);
+        void digitalin(BelaContext *context);
+        void digitalout(float *buffer);
         void clear();
         void midievent(int status, int data1, int data2);
         int loadfile(const char *file, int add);
@@ -26,6 +29,7 @@ class Pyo {
         int bufferSize;
         int sampleRate;
         int nAnalogChannels;
+        int nDigitalChannels;
         int nTotalChannels;
         PyThreadState *interpreter;
         float *pyoInBuffer;
