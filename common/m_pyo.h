@@ -47,8 +47,7 @@ INLINE PyThreadState * pyo_new_interpreter(float sr, int bufsize, int chnls) {
         PyEval_InitThreads();
         PyEval_ReleaseLock();
     }
-
-    /* This call hardcodes 2.7 as the python version to be used to embed pyo in
+        /* This call hardcodes 2.7 as the python version to be used to embed pyo in
        a C or C++ program. This is not a good idea and must be fixed when everthing
        is stable.
     */

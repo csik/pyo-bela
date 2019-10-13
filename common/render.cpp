@@ -14,6 +14,7 @@ void Bela_userSettings(BelaInitSettings *settings) {
     settings->numDigitalChannels = 16;
     settings->analogOutputsPersist = 0;
 }
+
 bool gpin = 0;
 
 bool setup(BelaContext *context, void *userData) {
@@ -49,7 +50,6 @@ void render(BelaContext *context, void *userData) {
         gpin = !gpin;
         pyo.value("freq", 1300+1300*gpin);
     }
-    //pyo.value("freq", 1300+1300*digitalRead(context, 0, 12));
 }
 
 void cleanup(BelaContext *context, void *userData) {}
