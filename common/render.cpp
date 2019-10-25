@@ -3,6 +3,7 @@
 #include <iostream>
 #include <Utilities.h>
 #include "PyoClass.h"
+#include "Python.h"
 
 Pyo pyo;
 
@@ -29,8 +30,7 @@ bool setup(BelaContext *context, void *userData) {
         printf("Error: file \"%s\" not found", filename);
         return false;
     }
-
-    return true;
+        return true;
 }
 
 void render(BelaContext *context, void *userData) {
@@ -46,10 +46,11 @@ void render(BelaContext *context, void *userData) {
     if (context->analogOut != NULL) {
         pyo.analogout(context->analogOut);
     }
-    if (digitalRead(context, 0, 12) != gpin){
-        gpin = !gpin;
-        pyo.value("freq", 1300+1300*gpin);
-    }
+    pyo.value("this", pyo.get_global());
+    //if (digitalRead(context, 0, 12) != gpin){
+    //    gpin = !gpin;
+    //    pyo.value("this", 300+100*gpin);
+    //}
 }
 
 void cleanup(BelaContext *context, void *userData) {}

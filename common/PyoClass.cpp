@@ -255,6 +255,12 @@ int Pyo::exec(const char *_msg) {
 ** Shutdown and reboot the pyo server while keeping current in/out buffers.
 ** This will erase audio objects currently active within the server.
 **
-*/void Pyo::clear() {
+*/
+void Pyo::clear() {
     pyo_server_reboot(interpreter);
+}
+
+int Pyo::get_global() {
+    int j = pyo_get_python_global(interpreter);
+    return j;
 }

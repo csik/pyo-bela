@@ -135,6 +135,18 @@ INLINE unsigned long pyo_get_output_buffer_address(PyThreadState *interp) {
     return uadd;
 }
 
+INLINE int pyo_get_python_global(PyThreadState *interp) {
+    PyObject *module, *obj;
+    PyEval_AcquireThread(interp);
+    module = PyImport_AddModule("__main__");
+    obj = PyObject_GetAttrString(module, "freq");
+    PyEval_ReleaseThread(interp);
+ 
+    long foobar = PyInt_AsLong(obj);
+    return (int) foobar;
+}
+
+
 /*
 ** Returns the address, as unsigned long, of the pyo embedded callback.
 ** This callback must be called in the host's perform routine whenever
