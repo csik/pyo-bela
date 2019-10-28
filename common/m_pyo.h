@@ -135,7 +135,7 @@ INLINE unsigned long pyo_get_output_buffer_address(PyThreadState *interp) {
     return uadd;
 }
 
-INLINE int pyo_get_python_global(PyThreadState *interp) {
+INLINE int pyo_get_python_int(PyThreadState *interp) {
     PyObject *module, *obj;
     PyEval_AcquireThread(interp);
     module = PyImport_AddModule("__main__");
@@ -146,6 +146,27 @@ INLINE int pyo_get_python_global(PyThreadState *interp) {
     return (int) foobar;
 }
 
+INLINE int pyo_set_python_int(PyThreadState *interp, int value) {
+    PyObject *module, *objvalue, *obj;
+    int result;
+    PyEval_AcquireThread(interp);
+    module = PyImport_AddModule("__main__");
+    obj = PyObject_GetAttrString(module, "freq");
+    objvalue = PyInt_FromLong((long int) 2000);    
+    result = PyObject_SetAttrString(obj, "freq", objvalue);
+    PyEval_ReleaseThread(interp);
+ 
+    return result;
+}
+
+INLINE PyObject* pyo_check_python_attr(PyThreadState *interp, const char *attr) {
+    PyObject *module, *obj;
+    PyEval_AcquireThread(interp);
+    module = PyImport_AddModule("__main__");
+    obj = PyObject_GetAttrString(module, attr);
+    PyEval_ReleaseThread(interp);
+    return obj; 
+}
 
 /*
 ** Returns the address, as unsigned long, of the pyo embedded callback.

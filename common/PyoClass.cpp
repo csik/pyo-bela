@@ -261,6 +261,17 @@ void Pyo::clear() {
 }
 
 int Pyo::get_global() {
-    int j = pyo_get_python_global(interpreter);
+    int j = pyo_get_python_int(interpreter);
     return j;
 }
+
+int Pyo::set_global(int j) {
+    pyo_set_python_int(interpreter, j);
+    return 1;
+}
+
+
+PyObject* Pyo::get_python_attr(const char *attr) {
+    return pyo_check_python_attr(interpreter, attr);
+}
+

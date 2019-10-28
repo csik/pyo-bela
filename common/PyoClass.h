@@ -15,6 +15,8 @@ class Pyo {
         void analogout(float *buffer);
         void clear();
         int get_global();
+        int set_global(int value);
+        PyObject* get_python_attr(const char *attr);
         void midievent(int status, int data1, int data2);
         int loadfile(const char *file, int add);
         int exec(const char *msg);
