@@ -33,7 +33,17 @@ bool gpin = 0;
 int frequency = 100;
 float gwaitaminute = 0;
 int gdelay = 0;
+int gdelayblock = 0;
+// Semaphors for checking if python functionality is added
 bool GOSC = 0;
+bool GDIG = 0;
+
+// Digital 
+//bool gpinstates[] = {0,0,0,0};
+//bool gdirstates[] = {0,0,0,0};
+//int  gpinNums[]   = {11,14,13,12};
+//const char *gpinNames[] = {"pins[0]","pins[1]","pins[2]","pins[3]"}; 
+//float gallPins[] = {1.0,0.0,0.0,0.0};
 
 void parseMessage(oscpkt::Message msg){
     rt_printf("received message to: %s\n", msg.addressPattern().c_str());
@@ -52,7 +62,11 @@ bool setup(BelaContext *context, void *userData) {
     // Load a python file.
     char filename[] = "main.py";
     int ret = pyo.loadfile(filename, 0);
-    if (pyo.get_python_attr("osc")) {    
+    // Check python is including functionality
+    if (pyo.get_python_attr("dig")) GDIG = 1;
+    //if (pyo.get_python_attr("osc")) GOSC = 1;
+    // Set up Open Sound Control code
+    if (GOSC) {    
         // OSC CODE
         oscServer.setup(localPort);//this is not actually needed if you do not need to receive messages
 	    oscClient.setup(remotePort, remoteIp);
@@ -71,8 +85,16 @@ bool setup(BelaContext *context, void *userData) {
         } else {
              rt_printf("timeout!\n");
         } 
-        GOSC = 1;
     }
+    
+    // Set up digital io code.
+    if (GDIG) {
+        int pinNums[]   = {11,14,13,12};
+        for(int x = 0; x < 4; x++) { 
+            pinMode(context, 0, pinNums[x], INPUT);
+        }
+    }
+
     if (ret != 0) {
         printf("Error: file \"%s\" not found", filename);
         return false;
@@ -86,28 +108,12 @@ void render(BelaContext *context, void *userData) {
     // Fill pyo input buffer (channels 2+) with analog inputs.
     pyo.analogin(context->analogIn);
     // Call pyo processing function and retrieve back stereo outputs.
-    // pyo.digitalin(context);
-    // Call pyo processing function and retrieve back stereo outputs.
     pyo.process(context->audioOut);
     // Get back pyo output channels 2+ as analog outputs.
     if (context->analogOut != NULL) {
         pyo.analogout(context->analogOut);
     }
-    frequency = pyo.get_global();
-    if (gwaitaminute > 7500) {
-        gwaitaminute = 0;
-    }
-    //pyo.set_global(gwaitaminute);
-    gwaitaminute+=2;
-    if (gdelay >= 20) {
-        gdelay = 0;
-
-        char fchar[32];
-        sprintf(fchar, "this.value=%f", gwaitaminute );
-        pyo.exec(fchar);
-    }
-    gdelay = gdelay+1;
-    
+   
     if (GOSC) {
         // receive OSC messages, parse them, and send back an acknowledgment
         while (oscServer.messageWaiting()){
@@ -115,12 +121,9 @@ void render(BelaContext *context, void *userData) {
             oscClient.queueMessage(oscClient.newMessage.to("/osc-acknowledge").add(5).add(4.2f).add(std::string("OSC message received")).end());
         }
     }
-    //exec("this = ")
-    //if (digitalRead(context, 0, 12) != gpin){
-    //    gpin = !gpin;
-    //    pyo.value("this", 300+100*gpin);
-    //}
+    pyo.digitalin(context->digital, context);
 }
+
 
 void cleanup(BelaContext *context, void *userData) {}
 

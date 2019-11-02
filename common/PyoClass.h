@@ -13,6 +13,7 @@ class Pyo {
         void fillin(const float *buffer);
         void analogin(const float *buffer);
         void analogout(float *buffer);
+        void digitalin(const uint32_t *buffer, BelaContext *context);
         void clear();
         int get_global();
         int set_global(int value);

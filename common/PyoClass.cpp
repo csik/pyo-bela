@@ -25,10 +25,25 @@ void Pyo::setup(int _nChannels, int _bufferSize, int _sampleRate, int _nAnalogCh
     pyoCallback = reinterpret_cast<callPtr*>(pyo_get_embedded_callback_address(interpreter));
     pyoId = pyo_get_server_id(interpreter);
 }
-int gjack_in_5 = 11;
-int gjack_in_6 = 10;
-int gjack_in_7 = 13;
-int gjack_in_8 = 12;
+
+
+// Digital 
+bool gpinstates[] = {0,0,0,0};
+bool gdirstates[] = {0,0,0,0};
+int  gpinNums[]   = {11,14,13,12};
+const char *gpinNames[] = {"pins[0]","pins[1]","pins[2]","pins[3]"}; 
+float gallPins[] = {1.0,0.0,0.0,0.0};
+
+
+extern bool gpin;
+extern int frequency;
+extern float gwaitaminute;
+extern int gdelay;
+extern int gdelayblock;
+// Semaphors for checking if python functionality is added
+extern bool GOSC;
+extern bool GDIG;
+
 
 
 
@@ -54,6 +69,36 @@ void Pyo::fillin(const float *buffer) {
 	    }
     }
 }
+
+void Pyo::digitalin(const uint32_t *buffer, BelaContext *context) {
+    int changed = 0;
+    for(int x = 0; x < 4; x++) {
+        if (digitalRead(context, 0, gpinNums[x]) != (int) gpinstates[x]) {
+            gpinstates[x] = !gpinstates[x];
+            gallPins[x] = gpinstates[x];
+            changed = 1;
+        }
+    }
+    if (changed == 1) {
+        set("te.freq", gallPins, 4);
+        value("change_flag", 1.0);
+    }
+}
+//        pyo.set("allpins.freq", gallPins, 4);
+//    for(int x =0; x < 4; x++) {
+//        gallPins[x] = !gallPins[x];
+
+//    if(gdelayblock == 1) {
+//      char fchar[32];
+//      sprintf(fchar, "allpins.printpins()");
+//      exec(fchar);
+//      gdelayblock = 0;
+//  }
+//  if(changed == 1) {
+//     set("allpins.freq", gallPins, 4);
+//     changed = 0;
+//     gdelayblock = 1;
+//  } 
 
 /*
 ** This function fills pyo's remaining input buffers (after audio voices)
